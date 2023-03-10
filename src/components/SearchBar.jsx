@@ -4,6 +4,8 @@ const SearchBar = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const inputVal = document.getElementById("input-id").value;
+    console.log("input", inputVal);
+    document.getElementById("input-id").value = "";
   };
 
   //   onChange={(e) => handleOnChange(e)}

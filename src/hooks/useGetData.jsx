@@ -20,8 +20,6 @@ const useGetData = (url) => {
     getData();
   }, [url]);
 
-  console.log("data from hook", data);
-
   return { data, error };
 };
 

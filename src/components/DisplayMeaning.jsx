@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import useGetData from "../hooks/useGetData";
 
 const DisplayMeaning = () => {
@@ -7,16 +7,9 @@ const DisplayMeaning = () => {
   // const [verb, setVerb] = useState("");
   // const [phontics, setPhonetics] = useState("");
   // const [media, setMedia] = useState(null);
+  // const [wordData, setWordData] = useState("");
+  // const [errorToDisplay, setErrorToDisplay] = useState(null);
   // UNNECESSARY STATE VARIABLES---------------->NOT NEEDED
-
-  const [wordData, setWordData] = useState("");
-  const [errorToDisplay, setErrorToDisplay] = useState(null);
-
-  const url = "https://api.dictionaryapi.dev/api/v2/entries/en/keyboard";
-
-  const { data, error } = useGetData(url);
-  if (error) throw new Error("ERROR:", error);
-  console.log(data);
 
   // calling setWordData here causes infinte loop
   // https://stackoverflow.com/questions/72450977/error-too-many-re-renders-with-usestate
@@ -51,23 +44,131 @@ const DisplayMeaning = () => {
 
   // -----------UNNECESSARY USE EFFECTS------
 
-  const nounData = data?.[0]?.["meanings"]?.find(
-    (meaning) => meaning?.partOfSpeech === "noun"
-  );
+  const [input, setInput] = useState(null);
 
-  const verbData = data?.[0]?.["meanings"]?.find(
-    (meaning) => meaning?.partOfSpeech === "verb"
-  );
+  // const { data, error } = useGetData(url);
+  // if (error) throw new Error("ERROR:", error);
+  // console.log(data);
+
+  // let { data, error } = useGetData(url);
+  // if (error) throw new Error("ERROR:", error);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const inputVal = document.getElementById("input-id").value;
+    console.log("input", inputVal);
+    setInput(inputVal);
+    // document.getElementById("input-id").value = "";
+  };
+  // const { data, error } = useGetData(url);
+
+  // SHOULD ONLY MAKE API CALL AFTER USER ENTER THE WORD IN SEARCH BAR
+
+  const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${input}`;
+  console.log(url);
+  const { data, error } = useGetData(url);
+  console.log("data", data);
+  console.log("error", error);
+  // useEffect(() => {
+  // }, [input]);
 
   const audio = data?.[0]?.["phonetics"]?.find(
     (phonetic) => phonetic?.audio !== ""
   );
 
-  console.log("nounData", nounData);
-  console.log("verbData", verbData);
-  console.log("audio", audio);
+  const firstPartOfSpeechMeanings = useMemo(
+    () =>
+      data?.[0]?.meanings?.[0]?.definitions?.map((definition) => definition),
+    [data]
+  );
 
-  return <div>DisplayMeaning</div>;
+  const firstPartOfSpeechSynonyms = useMemo(
+    () => data?.[0]?.meanings?.[0]?.synonyms?.map((synonym) => synonym),
+    [data]
+  );
+
+  const secondPartOfSpeechMeanings = useMemo(
+    () =>
+      data?.[0]?.meanings?.[1]?.definitions?.map((definition) => definition),
+    [data]
+  );
+
+  const examples = useMemo(
+    () =>
+      data?.[0]?.meanings?.[1]?.definitions?.map(
+        (definitions) => definitions?.example
+      ),
+    [data]
+  );
+
+  return (
+    <div>
+      <div>
+        <form onSubmit={handleSubmit}>
+          <input type="text" id="input-id" />
+          <input type="submit" />
+        </form>
+      </div>
+      <div>
+        <h1>Keyboard</h1>
+        <div>{audio?.text}</div>
+      </div>
+      <div>
+        <MeaningDataToDisplay
+          partOfSpeech={data?.[0]?.meanings?.[0].partOfSpeech}
+          meanings={firstPartOfSpeechMeanings}
+        />
+        <PlayAudio audioUrl={audio?.audio} />
+        <div>Synonyms</div>
+        <div>
+          {firstPartOfSpeechSynonyms?.map((synonym) => (
+            <div key={synonym}>{synonym}</div>
+          ))}
+        </div>
+        <MeaningDataToDisplay
+          partOfSpeech={data?.[0]?.meanings?.[1].partOfSpeech}
+          meanings={secondPartOfSpeechMeanings}
+        />
+        <div>
+          {examples?.map((example) => (
+            <div key={example}>{example}</div>
+          ))}
+        </div>
+        <div>source</div>
+        <div>
+          {data?.[0]?.sourceUrls?.map((sources) => {
+            return <div key={sources}>{sources}</div>;
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MeaningDataToDisplay = ({ partOfSpeech, meanings }) => {
+  return (
+    <div>
+      <div>{partOfSpeech}</div>
+      <div>Meaning</div>
+      <ul>
+        {meanings?.map((meaninig) => (
+          <li key={meaninig?.definition}>{meaninig?.definition}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const PlayAudio = ({ audioUrl }) => {
+  const handlePlay = () => {
+    const audio = new Audio(audioUrl);
+    audio?.play();
+  };
+  return (
+    <div>
+      <button onClick={handlePlay}>Play</button>
+    </div>
+  );
 };
 
 export default DisplayMeaning;

@@ -7,7 +7,6 @@ import DisplayMeaning from "./components/DisplayMeaning";
 const App = () => {
   return (
     <div className="App">
-      <h1>dictionary-app</h1>
       {/* <SearchBar /> */}
       <DisplayMeaning />
     </div>
