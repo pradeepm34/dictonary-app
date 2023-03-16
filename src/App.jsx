@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
 import "./App.css";
-import SearchBar from "./components/SearchBar";
 import DisplayMeaning from "./components/DisplayMeaning";
-// import getData from "./hooks/useGetData";
+import HeaderComponent from "./components/HeaderComponent";
 
 const App = () => {
   return (
-    <div className="App">
-      {/* <SearchBar /> */}
+    <div className="App sm:max-w-sm sm:h-full">
+      <HeaderComponent />
       <DisplayMeaning />
     </div>
   );

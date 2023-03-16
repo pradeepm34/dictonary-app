@@ -46,15 +46,6 @@ const DisplayMeaning = () => {
   const [input, setInput] = useState(null);
   const [wordData, setWordData] = useState(null);
   const [errorToDisplay, setErrorToDisplay] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.style.cssText = "background-color: black";
-    } else {
-      document.documentElement.style.cssText = "background-color: white";
-    }
-  }, [darkMode]);
 
   // const { data, error } = useGetData(url);
   // if (error) throw new Error("ERROR:", error);
@@ -67,8 +58,8 @@ const DisplayMeaning = () => {
     e.preventDefault();
     const inputVal = document.getElementById("input-id").value;
     console.log("input", inputVal);
-    setInput(inputVal);
     setErrorToDisplay(false);
+    setInput(inputVal);
     setWordData(null);
   };
 
@@ -116,10 +107,6 @@ const DisplayMeaning = () => {
     [wordData]
   );
 
-  const handleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
-
   return (
     <div>
       <div>
@@ -129,42 +116,41 @@ const DisplayMeaning = () => {
         </form>
       </div>
       <div>
-        <h1>{wordData?.[0]?.word}</h1>
+        <h1 className="text-gray-300">{wordData?.[0]?.word}</h1>
         <div>{audio?.text}</div>
       </div>
-      {errorToDisplay ? (
+      {/* {errorToDisplay ? ( */}
+      <div>
+        <MeaningDataToDisplay
+          partOfSpeech={wordData?.[0]?.meanings?.[0]?.partOfSpeech}
+          meanings={firstPartOfSpeechMeanings}
+        />
+        <PlayAudio audioUrl={audio?.audio} />
+        <div>Synonyms</div>
         <div>
-          <MeaningDataToDisplay
-            partOfSpeech={wordData?.[0]?.meanings?.[0]?.partOfSpeech}
-            meanings={firstPartOfSpeechMeanings}
-          />
-          <PlayAudio audioUrl={audio?.audio} />
-          <div>Synonyms</div>
-          <div>
-            {firstPartOfSpeechSynonyms?.map((synonym) => (
-              <div key={synonym}>{synonym}</div>
-            ))}
-          </div>
-          <MeaningDataToDisplay
-            partOfSpeech={wordData?.[0]?.meanings?.[1]?.partOfSpeech}
-            meanings={secondPartOfSpeechMeanings}
-          />
-          <div>
-            {examples?.map((example) => (
-              <div key={example}>{example}</div>
-            ))}
-          </div>
-          <div>source</div>
-          <div>
-            {data?.[0]?.sourceUrls?.map((sources) => {
-              return <div key={sources}>{sources}</div>;
-            })}
-          </div>
+          {firstPartOfSpeechSynonyms?.map((synonym) => (
+            <div key={synonym}>{synonym}</div>
+          ))}
         </div>
-      ) : (
+        <MeaningDataToDisplay
+          partOfSpeech={wordData?.[0]?.meanings?.[1]?.partOfSpeech}
+          meanings={secondPartOfSpeechMeanings}
+        />
+        <div>
+          {examples?.map((example) => (
+            <div key={example}>{example}</div>
+          ))}
+        </div>
+        <div>source</div>
+        <div>
+          {data?.[0]?.sourceUrls?.map((sources) => {
+            return <div key={sources}>{sources}</div>;
+          })}
+        </div>
+      </div>
+      {/* ) : (
         "Please check the word"
-      )}
-      <button onClick={handleDarkMode}>darkMode</button>
+      )} */}
     </div>
   );
 };
